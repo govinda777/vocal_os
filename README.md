@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VocalOS (Project Echo) - Agente de Voz para OS Industrial
 
-## Getting Started
+![Logo](./public/manifest.json) <!-- Referência ao PWA -->
 
-First, run the development server:
+VocalOS é uma Prova de Conceito (PoC) de um agente de voz inteligente projetado para o chão de fábrica. Ele permite que operadores de manutenção abram Ordens de Serviço (OS) de forma rápida e precisa usando apenas a voz e escaneamento de QR Code.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🚀 Demonstração Rápida
+
+| Dashboard | Scanner & Voz | Revisão de IA |
+| :---: | :---: | :---: |
+| ![Dashboard](./public/screenshots/dashboard.png) | ![Scanner](./public/screenshots/asset_identified.png) | ![Review](./public/screenshots/review_modal.png) |
+
+---
+
+## 🧠 O Problema e a Solução
+
+**O Problema**: Operadores perdem tempo precioso e geram dados de baixa qualidade ao digitar relatórios técnicos em terminais fixos, muitas vezes usando luvas ou em posições desconfortáveis.
+
+**A Solução**: "Diga o problema, a IA estrutura o dado". O VocalOS utiliza:
+1. **Identificação**: QR Code para reconhecimento imediato do ativo.
+2. **Voz**: Interface "Walkie-Talkie" para relato informal.
+3. **IA Generativa**: Whisper (transcrição) + GPT-4o (estruturação) via **LangGraph**.
+4. **Sincronização**: Envio direto para o ERP após aprovação humana.
+
+---
+
+## 🛠️ Arquitetura e Fluxo
+
+O projeto utiliza **LangGraph** para orquestrar o estado da OS desde a captura até a sincronização.
+
+### Fluxo de Dados (Sequência)
+```mermaid
+sequenceDiagram
+    participant Operador
+    participant App (Next.js)
+    participant AI_Agent (Whisper/GPT/LangGraph)
+    participant ERP_Mock (Hono)
+
+    Operador->>App: Escaneia QR Code
+    App->>App: Identifica Ativo (LocalStorage)
+    Operador->>App: Segura Mic e Fala Problema
+    App->>AI_Agent: Envia Audio Blob
+    AI_Agent->>AI_Agent: Transcreve & Estrutura
+    AI_Agent-->>App: Retorna Rascunho de OS
+    App->>Operador: Exibe Modal de Revisão
+    Operador->>App: Edita e Confirma
+    App->>ERP_Mock: POST /register-os
+    ERP_Mock-->>App: Retorna Protocolo OS
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Tecnologias Utilizadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: Next.js 15+ (App Router)
+- **Estilização**: Tailwind CSS v4 + Shadcn UI
+- **Orquestração de IA**: LangChain.js + LangGraph
+- **Modelos**: OpenAI GPT-4o & Whisper-1
+- **Backend Mock**: Hono.js em Edge Functions
+- **PWA**: Suporte para instalação e modo mobile-first
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 Como Executar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Instale as dependências**:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Configure as variáveis de ambiente**:
+   Crie um arquivo `.env` na raiz:
+   ```env
+   OPENAI_API_KEY=sua_chave_aqui
+   ```
 
-## Deploy on Vercel
+3. **Inicie o servidor de desenvolvimento**:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Acesse**: `http://localhost:3000`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📋 Documentação Completa
+
+Para detalhes profundos sobre regras de negócio, arquitetura de software e guias de implementação, consulte a [**Documentação Técnica e de Negócio (DOCUMENTATION.md)**](./DOCUMENTATION.md).
